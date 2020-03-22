@@ -2,7 +2,10 @@ const express = require('express'),
     router = express.Router(),
     User = require('./schema.js'),
     bcrypt = require('bcrypt'),
-    BCRYPT_SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS);
+    jwt = require('jsonwebtoken'),
+    BCRYPT_SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS),
+    JWTKEY = process.env.JWTKEY,
+    JWTEXPIRE = process.env.JWTEXPIRE;
 
 /**
  * POST
@@ -11,10 +14,11 @@ const express = require('express'),
  *      implement a check for USERNAME ALREADY TAKEN
  *      implement logic for interpreting salted password in the request
  */
+
+
 router.post('/register', (req, res) => {
     let username = req.body.username;
     let password = req.body.password;
-
     bcrypt.hash(password, BCRYPT_SALT_ROUNDS)
         .then(hash => {
             let user = new User({
@@ -52,8 +56,13 @@ router.post('/login', (req, res) => {
             if (!passwordMatch) {
                 res.status(403).send();
             }
+            const token = jwt.sign({username}, JWTKEY, {
+                algorithm: 'HS256',
+                expiresIn: JWTEXPIRE * 1000
+            })
             res.status(200).json({
-                data: data
+                data: data,
+                token: token
             })
         })
         .catch(err => {
