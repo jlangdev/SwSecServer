@@ -31,8 +31,14 @@ router.post('/register', (req, res) => {
                         err: err
                     });
                 }
+                const token = jwt.sign({username}, JWTKEY, {
+                    algorithm: 'HS256',
+                    expiresIn: JWTEXPIRE * 1000
+                })
                 res.status(200).json({
-                    msg: username + " successfully registered."
+                    msg: username + " successfully registered.",
+                    data: data,
+                    token: token
                 });
             });
         });

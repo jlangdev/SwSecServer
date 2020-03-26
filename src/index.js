@@ -9,7 +9,8 @@ const path = require('path'),
     bodyParser = require('body-parser'),
     mongoose = require('mongoose'),
     express = require('express'),
-    cors = require('cors');
+    cors = require('cors'),
+    authenticate = require('./auth/auth.js');
 
 /**
  * import resources/routers
@@ -43,7 +44,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
  * attach routes and attach middleware
  */
 app.use('/users', users);
-app.use('/messages', messages);
+app.use('/messages', authenticate, messages);
 
 
 /**

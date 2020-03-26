@@ -11,13 +11,13 @@ const express = require('express'),
 
 router.get('/:username', (req, res) => {
     let username =  req.params.username;
-
-    //Authorization
-    authorize(req,res);
-
+    
+    if(req.decodedUser != username){
+        username = ''
+    }
     
     Message.find({
-        username: username
+        username: username,
     }, (err, doc) => {
         if(err) {
             res.status(500).json({
@@ -36,10 +36,9 @@ router.get('/:username', (req, res) => {
  */
 router.get('/:username/new', (req, res) => {
     let username =  req.params.username;
-
-    //Authorization
-    authorize(req,res);
-
+    if(req.decodedUser != username){
+        username = ''
+    }
 
     Message.findOne({
         username: username
@@ -70,9 +69,11 @@ router.post('/:username', (req, res) => {
         username: req.params.username,
         time: req.body.time
     };
+    if(req.decodedUser != req.params.username){
+        message.username = "faked"
+        message.message = "Suspicious activity detected. This request has been logged"
+    }
 
-    //Authorization
-    authorize(req,res);
 
     Message.create(message, (err, doc) => {
         if(err) {
